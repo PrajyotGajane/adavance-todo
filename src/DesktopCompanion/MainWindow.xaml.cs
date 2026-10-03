@@ -380,13 +380,21 @@ public partial class MainWindow : Window
         Focus();
     }
 
+    // Expanded view creates notes in-window; compact view uses the quick scratchpad.
+    void NewNoteInApp()
+    {
+        if (!_expanded) { App.Scratchpad.ShowPad(); return; }
+        ShowNotesView();
+        NotesPane.NewNote();
+    }
+
     public void CommitNotes() { if (_notesMode) NotesPane.Commit(); }
 
     void Tasks_Click(object s, RoutedEventArgs e) => ShowTasksView();
     void ToggleView_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); ToggleExpanded(); }
     void Top_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); ToggleTop(); }
-    void Add_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); if (_notesMode) App.Scratchpad.ShowPad(); else BeginTaskEdit(); }
-    void AddNote_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); App.Scratchpad.ShowPad(); }
+    void Add_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); if (_notesMode) NotesPane.NewNote(); else BeginTaskEdit(); }
+    void AddNote_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); NewNoteInApp(); }
     void Notes_Click(object s, RoutedEventArgs e) => ShowNotesView();
     void Settings_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); App.ShowSettings(0); }
     void Appearance_Click(object s, RoutedEventArgs e) { ReleaseDrawer(); App.ShowSettings(1); }
@@ -453,7 +461,7 @@ public partial class MainWindow : Window
         else if (none && (key == Key.Enter || key == Key.F2)) { if (Selected is { } t) BeginTaskEdit(t); }
         else if (none && key == Key.Delete) { if (Selected is { } t) Store.DeleteTask(t); }
         else if (none && key == Key.N) BeginTaskEdit();
-        else if (shift && key == Key.N) App.Scratchpad.ShowPad();
+        else if (shift && key == Key.N) NewNoteInApp();
         else if (none && key == Key.O) ShowNotesView();
         else if (none && key == Key.E) ToggleExpanded();
         else if (none && key == Key.T) ToggleTop();

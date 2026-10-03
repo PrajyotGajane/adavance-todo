@@ -7,6 +7,7 @@ namespace DesktopCompanion;
 public partial class NotesView : UserControl
 {
     NoteItem? _editing;
+    bool _isNew;
 
     public event Action? CloseRequested;
 
@@ -34,14 +35,25 @@ public partial class NotesView : UserControl
         Rebuild();
     }
 
-    void OpenNote(NoteItem n)
+    public void NewNote()
+    {
+        CommitEdit();
+        OpenNote(new NoteItem(), true);
+    }
+
+    void OpenNote(NoteItem n, bool isNew = false)
     {
         _editing = n;
+        _isNew = isNew;
+        EditTitle.Text = isNew ? "New note" : "Edit note";
         Editor.Text = n.Body;
         ListView.Visibility = Visibility.Collapsed;
         EditView.Visibility = Visibility.Visible;
-        Editor.Focus();
-        Editor.CaretIndex = Editor.Text.Length;
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, () =>
+        {
+            Keyboard.Focus(Editor);
+            Editor.CaretIndex = Editor.Text.Length;
+        });
     }
 
     // Saves the open note (or removes it if emptied).
@@ -49,7 +61,11 @@ public partial class NotesView : UserControl
     {
         if (_editing is not { } n) return;
         var text = Editor.Text.Trim();
-        if (text.Length == 0) Store.DeleteNote(n);
+        if (_isNew)
+        {
+            if (text.Length > 0) { _editing = Store.AddNote(text); _isNew = false; }
+        }
+        else if (text.Length == 0) Store.DeleteNote(n);
         else Store.UpdateNote(n, text);
     }
 
@@ -66,7 +82,7 @@ public partial class NotesView : UserControl
     }
 
     void Back_Click(object s, RoutedEventArgs e) { CommitEdit(); ShowListView(); Search.Focus(); }
-    void Delete_Click(object s, RoutedEventArgs e) { if (_editing is { } n) { _editing = null; Store.DeleteNote(n); ShowListView(); Search.Focus(); } }
+    void Delete_Click(object s, RoutedEventArgs e) { if (_editing is { } n) { _editing = null; if (!_isNew) Store.DeleteNote(n); ShowListView(); Search.Focus(); } }
 
     void NoteList_Click(object s, MouseButtonEventArgs e)
     {
@@ -112,7 +128,7 @@ public partial class NotesView : UserControl
             case Key.PageDown when !ctrl: Move(4); return true;
             case Key.PageUp when !ctrl: Move(-4); return true;
             case Key.Enter when !ctrl: if (NoteList.SelectedItem is NoteItem n) OpenNote(n); return true;
-            case Key.N when ctrl: App.Scratchpad.ShowPad(); return true;
+            case Key.N when ctrl: NewNote(); return true;
         }
         if ((ctrl && key == Key.D) || (key == Key.Delete && Search.Text.Length == 0))
         {
