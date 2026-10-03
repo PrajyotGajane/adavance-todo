@@ -46,7 +46,7 @@ public partial class MainWindow : Window
     void ToggleView()
     {
         _expanded = !_expanded;
-        Card.Width = _expanded ? 400 : 360;
+        Card.Width = _expanded ? 420 : 380;
         ListScroll.MaxHeight = _expanded ? 186 : 124;
         ToggleViewText.Text = _expanded ? "Compact view" : "Expanded view";
     }
@@ -74,4 +74,5 @@ public partial class MainWindow : Window
         else if (ctrl && e.Key == Key.H) WindowState = WindowState.Minimized;
     }
 }
+
 

@@ -6,11 +6,9 @@
         Topmost="True" ResizeMode="NoResize" ShowInTaskbar="True"
         KeyDown="Window_KeyDown">
   <Grid Margin="10">
-    <Border x:Name="Card" Width="360" Background="{StaticResource CardBrush}" CornerRadius="12"
+    <Border Width="{Binding ActualWidth, ElementName=Card}" Height="{Binding ActualHeight, ElementName=Card}" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.45" Color="Black"/></Border.Effect></Border>
+    <Border x:Name="Card" Width="380" HorizontalAlignment="Left" VerticalAlignment="Top" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" Background="{StaticResource CardBrush}" CornerRadius="12"
             BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
-      <Border.Effect>
-        <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.45" Color="Black"/>
-      </Border.Effect>
       <StackPanel>
         <Grid x:Name="Header" Height="44" Background="Transparent" Margin="8,0,8,0"
               MouseLeftButtonDown="Header_MouseDown">
@@ -128,6 +126,8 @@
     </Popup>
   </Grid>
 </Window>
+
+
 
 
 

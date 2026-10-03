@@ -4,9 +4,11 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
         ShowInTaskbar="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
         PreviewKeyDown="Window_PreviewKeyDown">
-  <Border Margin="12" Width="300" Height="220" Background="{StaticResource CardBrush}" CornerRadius="12"
+  <Grid>
+  <Border Margin="12" Width="300" Height="220" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect></Border>
+  <Border Margin="12" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Width="300" Height="220" Background="{StaticResource CardBrush}" CornerRadius="12"
           BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5">
-    <Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect>
+    
     <Grid>
       <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="42"/></Grid.RowDefinitions>
       <Grid Margin="14,12,14,0">
@@ -42,5 +44,6 @@
       </Grid>
     </Grid>
   </Border>
+</Grid>
 </Window>
 
