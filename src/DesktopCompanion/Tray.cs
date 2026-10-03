@@ -18,8 +18,14 @@ public sealed class Tray : IDisposable
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Quit", null, (_, _) => App.Quit());
 
-        _icon = new Forms.NotifyIcon { Icon = MakeIcon(), Text = "Desktop Companion", Visible = true, ContextMenuStrip = menu };
+        _icon = new Forms.NotifyIcon { Icon = LoadIcon(), Text = "Desktop Companion", Visible = true, ContextMenuStrip = menu };
         _icon.MouseClick += (_, e) => { if (e.Button == Forms.MouseButtons.Left) App.Widget.ToggleWidget(); };
+    }
+
+    static Drawing.Icon LoadIcon()
+    {
+        var res = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/app.ico"));
+        return res != null ? new Drawing.Icon(res.Stream, new Drawing.Size(32, 32)) : MakeIcon();
     }
 
     static Drawing.Icon MakeIcon()

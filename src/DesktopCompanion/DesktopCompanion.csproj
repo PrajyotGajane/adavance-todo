@@ -6,6 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyName>DesktopCompanion</AssemblyName>
     <RootNamespace>DesktopCompanion</RootNamespace>
     <TieredPGO>false</TieredPGO>
@@ -14,6 +15,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="app.ico" />
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.*" />
