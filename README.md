@@ -49,3 +49,5 @@ Global: Ctrl+Alt+T quick add, Ctrl+Alt+J scratchpad, Ctrl+Alt+H show/hide.
 
 ## Releases
 Pushing a tag like `v0.0.1` runs .github/workflows/release.yml, which builds a self-contained single-file exe (no .NET install, no admin rights) and attaches a zip + SHA256 to a GitHub release.
+
+Microsoft Store packaging: see `packaging/STORE.md`.
