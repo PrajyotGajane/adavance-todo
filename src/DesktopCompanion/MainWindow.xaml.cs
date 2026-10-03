@@ -265,8 +265,9 @@ public partial class MainWindow : Window
     void SetExpanded(bool on)
     {
         _expanded = on;
-        Card.Width = on ? 420 : 380;
-        ListScroll.MaxHeight = on ? 186 : 124;
+        Card.Width = on ? 500 : 380;
+        ListScroll.MinHeight = on ? 446 : 0;
+        ListScroll.MaxHeight = on ? 446 : 124;
         ToggleViewText.Text = on ? "Compact view" : "Expanded view";
     }
 
