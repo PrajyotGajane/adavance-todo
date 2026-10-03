@@ -90,7 +90,7 @@
         <Border.Effect><DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.5"/></Border.Effect>
         <StackPanel>
           <Button Style="{StaticResource MenuRow}" Click="Add_Click">
-            <Grid><TextBlock Text="&#xE710;" Style="{StaticResource IconText}" HorizontalAlignment="Left"/><TextBlock Text="Add task" Margin="28,0,0,0"/><TextBlock Text="Ctrl + N" Foreground="{StaticResource Muted2Brush}" FontSize="10.5" HorizontalAlignment="Right"/></Grid>
+            <Grid><TextBlock Text="&#xE710;" Style="{StaticResource IconText}" HorizontalAlignment="Left"/><TextBlock Text="Add task" Margin="28,0,0,0"/><TextBlock Text="Ctrl + Shift + N" Foreground="{StaticResource Muted2Brush}" FontSize="10.5" HorizontalAlignment="Right"/></Grid>
           </Button>
           <Button Style="{StaticResource MenuRow}" Click="AddNote_Click" AutomationProperties.AutomationId="AddNoteRow">
             <Grid><TextBlock Text="&#xE8A5;" Style="{StaticResource IconText}" HorizontalAlignment="Left"/><TextBlock Text="Add note" Margin="28,0,0,0"/><TextBlock Text="Ctrl + Alt + N" Foreground="{StaticResource Muted2Brush}" FontSize="10.5" HorizontalAlignment="Right"/></Grid>
@@ -126,6 +126,7 @@
     </Popup>
   </Grid>
 </Window>
+
 
 
 

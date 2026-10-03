@@ -1,12 +1,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace DesktopCompanion;
 
 public partial class MainWindow : Window
 {
     bool _expanded;
+    HotkeyManager? _hotkeys;
 
     public MainWindow()
     {
@@ -17,8 +19,28 @@ public partial class MainWindow : Window
         TaskItem.Changed += UpdateCounts;
         foreach (var list in SampleData.Tasks.Values)
             list.CollectionChanged += (_, _) => UpdateCounts();
+        SourceInitialized += (_, _) => RegisterHotkeys();
+        Closed += (_, _) => _hotkeys?.Dispose();
         ShowTab("Today");
         UpdateCounts();
+    }
+
+    void RegisterHotkeys()
+    {
+        _hotkeys = new HotkeyManager(new WindowInteropHelper(this).Handle);
+        var failed = new List<string>();
+        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Shift, Key.N, () => App.QuickAdd.ShowOverlay()))
+            failed.Add("Ctrl+Shift+N (quick add)");
+        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Alt, Key.N, ToggleScratchpad))
+            failed.Add("Ctrl+Alt+N (scratchpad)");
+        if (failed.Count > 0)
+            MessageBox.Show("These shortcuts are already used by another app:\n" + string.Join("\n", failed), "Desktop Companion");
+    }
+
+    static void ToggleScratchpad()
+    {
+        if (App.Scratchpad.IsVisible && App.Scratchpad.IsActive) App.Scratchpad.Hide();
+        else App.Scratchpad.ShowPad();
     }
 
     void UpdateCounts()
@@ -68,11 +90,10 @@ public partial class MainWindow : Window
     void Window_KeyDown(object s, KeyEventArgs e)
     {
         var ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-        var alt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
-        if (ctrl && e.Key == Key.N && !alt) App.QuickAdd.ShowOverlay();
-        else if (ctrl && alt && e.SystemKey == Key.N) App.Scratchpad.ShowPad();
-        else if (ctrl && e.Key == Key.H) WindowState = WindowState.Minimized;
+        if (ctrl && e.Key == Key.H) WindowState = WindowState.Minimized;
     }
 }
+
+
 
 
