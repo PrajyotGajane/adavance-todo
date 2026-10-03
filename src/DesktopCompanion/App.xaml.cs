@@ -10,11 +10,20 @@ public partial class App : Application
     static QuickAddWindow? _quick;
     static ScratchpadWindow? _pad;
     static NotesWindow? _notes;
+    static SettingsWindow? _settings;
+    Mutex? _single;
+    Tray? _tray;
+
+    public static MainWindow Widget { get; private set; } = null!;
+    public static bool Quitting { get; private set; }
 
     // Created on first use to keep idle memory low.
     public static QuickAddWindow QuickAdd => _quick ??= new QuickAddWindow();
     public static ScratchpadWindow Scratchpad => _pad ??= new ScratchpadWindow();
     public static NotesWindow Notes => _notes ??= new NotesWindow();
+
+    public static void ShowNotes() { Notes.ShowList(); }
+    public static void ShowSettings(int row) { (_settings ??= new SettingsWindow()).ShowAt(row); }
 
     [DllImport("psapi.dll")]
     static extern bool EmptyWorkingSet(IntPtr process);
@@ -30,6 +39,33 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (Environment.GetEnvironmentVariable("DC_ALLOW_MULTI") == null)
+        {
+            _single = new Mutex(true, @"Local\DesktopCompanion.SingleInstance", out var first);
+            if (!first) { Shutdown(); return; }
+        }
+        Store.Init();
+        Widget = new MainWindow();
+        Widget.Show();
+        _tray = new Tray();
         TrimMemory();
     }
+
+    public static void Quit()
+    {
+        if (Quitting) return;
+        Quitting = true;
+        Widget.SavePosition();
+        _pad?.SaveDraft();
+        Current.Shutdown();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _tray?.Dispose();
+        Db.Close();
+        _single?.Dispose();
+        base.OnExit(e);
+    }
 }
+

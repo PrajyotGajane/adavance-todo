@@ -1,0 +1,43 @@
+<Window x:Class="DesktopCompanion.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
+        ShowInTaskbar="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
+        PreviewKeyDown="Window_PreviewKeyDown">
+  <Grid>
+    <Border Margin="12" Width="420" Height="{Binding ActualHeight, ElementName=Card}" VerticalAlignment="Top" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect></Border>
+    <Border x:Name="Card" Margin="12" Width="420" VerticalAlignment="Top" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Background="{StaticResource CardBrush}" CornerRadius="12"
+            BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" MouseLeftButtonDown="Drag">
+      <StackPanel Margin="14,12,14,10">
+        <Grid Margin="0,0,0,8">
+          <TextBlock Text="Settings" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+          <Button Style="{StaticResource IconButton}" Content="&#xE711;" HorizontalAlignment="Right" Click="Close_Click" ToolTip="Close (Esc)"/>
+        </Grid>
+
+        <Border x:Name="Row0" Height="34" CornerRadius="6" Background="Transparent" Padding="10,0" MouseLeftButtonDown="Row_Click" Tag="0" AutomationProperties.AutomationId="RowStartup">
+          <Grid><TextBlock Text="Start with Windows" VerticalAlignment="Center"/><TextBlock x:Name="Val0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/></Grid>
+        </Border>
+        <Border x:Name="Row1" Height="34" CornerRadius="6" Background="Transparent" Padding="10,0" MouseLeftButtonDown="Row_Click" Tag="1" AutomationProperties.AutomationId="RowOpacity">
+          <Grid><TextBlock Text="Widget opacity" VerticalAlignment="Center"/><TextBlock x:Name="Val1" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/></Grid>
+        </Border>
+        <Border Height="1" Background="{StaticResource DividerBrush}" Margin="4,6"/>
+        <Border x:Name="Row2" Height="34" CornerRadius="6" Background="Transparent" Padding="10,0" MouseLeftButtonDown="Row_Click" Tag="2" AutomationProperties.AutomationId="RowQuick">
+          <Grid><TextBlock Text="Quick add task" VerticalAlignment="Center"/><TextBlock x:Name="Val2" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/></Grid>
+        </Border>
+        <Border x:Name="Row3" Height="34" CornerRadius="6" Background="Transparent" Padding="10,0" MouseLeftButtonDown="Row_Click" Tag="3" AutomationProperties.AutomationId="RowPad">
+          <Grid><TextBlock Text="Quick note (scratchpad)" VerticalAlignment="Center"/><TextBlock x:Name="Val3" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/></Grid>
+        </Border>
+        <Border x:Name="Row4" Height="34" CornerRadius="6" Background="Transparent" Padding="10,0" MouseLeftButtonDown="Row_Click" Tag="4" AutomationProperties.AutomationId="RowToggle">
+          <Grid><TextBlock Text="Show / hide widget" VerticalAlignment="Center"/><TextBlock x:Name="Val4" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/></Grid>
+        </Border>
+        <TextBlock x:Name="Status" AutomationProperties.AutomationId="SettingsStatus" Margin="10,6,10,0" FontSize="11" Foreground="{StaticResource Muted2Brush}" TextWrapping="Wrap"/>
+        <Border Height="1" Background="{StaticResource DividerBrush}" Margin="4,8,4,8"/>
+        <TextBlock Text="Widget keys" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,4"/>
+        <TextBlock FontSize="10.5" Foreground="{StaticResource Muted2Brush}" Margin="10,0,0,0" LineHeight="16" TextWrapping="Wrap"
+                   Text="Up/Down select task  -  Left/Right or 1-4 switch tab  -  Space done  -  Enter edit  -  Del delete&#10;Shift+Left/Right move task between tabs  -  N new task  -  Shift+N new note  -  O notes&#10;E expand  -  T always on top  -  M menu  -  Ctrl+, settings  -  Esc / Ctrl+H hide  -  Ctrl+Q quit"/>
+        <TextBlock Text="Up/Down select  -  Left/Right or Space change  -  Enter rebind  -  Esc close" FontSize="10" Foreground="{StaticResource Muted2Brush}" Margin="10,10,0,0"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>
+

@@ -30,3 +30,16 @@ Measured with `Process.PrivateMemorySize64` / `WorkingSet64` after the app settl
 Without trimming, the working set was 92 MB idle and 105 MB after using overlays, so the app trims the working set when idle (`App.TrimMemory`) and creates overlay windows lazily. Idle CPU is ~0.
 
 
+
+## Features (v2)
+- SQLite persistence at `%LOCALAPPDATA%\DesktopCompanion\data.db` (override with `DESKTOPCOMPANION_DATA`).
+- Tray icon, hide-to-tray, single instance, optional start with Windows, opacity, rebindable global shortcuts (Settings).
+- Hamburger menu: "Always on top" toggle.
+- Natural-language quick add ("Call mom tomorrow 10am #family"), scratchpad autosave after 5 min idle, notes search.
+- Memory: ~49 MB private / ~14 MB working set idle, ~58 MB after use (limit 100 MB).
+
+## Keyboard map (main widget)
+Up/Down/Home/End/PgUp/PgDn select - Left/Right or 1-4 switch tab - Space done - Enter/F2 edit - Del delete -
+Shift+Left/Right move task between tabs - N new task - Shift+N scratchpad - O notes - E expand - T always on top -
+M/F10 menu - Ctrl+, settings - F1 shortcuts - Esc hide - Ctrl+Q quit.
+Global: Ctrl+Alt+T quick add, Ctrl+Alt+J scratchpad, Ctrl+Alt+H show/hide.

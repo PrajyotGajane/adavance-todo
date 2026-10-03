@@ -1,0 +1,22 @@
+<Window x:Class="DesktopCompanion.ToastWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
+        ShowInTaskbar="False" ShowActivated="False" Focusable="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+  <Grid>
+    <Border Margin="12" Width="250" Height="62" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect></Border>
+    <Border Margin="12" Width="250" Height="62" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Background="{StaticResource CardBrush}" CornerRadius="12"
+            BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
+      <Grid Margin="14,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Border Width="26" Height="26" CornerRadius="13" Background="#80CB89" VerticalAlignment="Center">
+          <TextBlock Text="&#xE73E;" Style="{StaticResource IconText}" Foreground="#0D131B" FontSize="13"/>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+          <TextBlock x:Name="Heading" FontSize="13" FontWeight="SemiBold"/>
+          <TextBlock x:Name="Sub" FontSize="11" Foreground="{StaticResource Muted2Brush}" Margin="0,2,0,0"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

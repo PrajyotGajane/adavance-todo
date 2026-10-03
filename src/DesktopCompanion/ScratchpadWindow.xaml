@@ -5,45 +5,52 @@
         ShowInTaskbar="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
         PreviewKeyDown="Window_PreviewKeyDown">
   <Grid>
-  <Border Margin="12" Width="300" Height="220" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect></Border>
-  <Border Margin="12" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Width="300" Height="220" Background="{StaticResource CardBrush}" CornerRadius="12"
-          BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5">
-    
-    <Grid>
-      <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="42"/></Grid.RowDefinitions>
-      <Grid Margin="14,12,14,0">
-        <TextBlock x:Name="Hint" Text="Start typing your note..." Foreground="{StaticResource Muted2Brush}" FontSize="13" IsHitTestVisible="False"/>
-        <TextBox x:Name="Editor" AutomationProperties.AutomationId="PadEditor" Background="Transparent" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap"
-                 VerticalScrollBarVisibility="Hidden" Foreground="{StaticResource TextBrush}"
-                 CaretBrush="{StaticResource AccentBrush}" FontFamily="Roboto, Segoe UI" FontSize="13"
-                 TextChanged="Editor_TextChanged" Padding="0"/>
+    <Border Margin="12" Width="300" Height="200" Background="{StaticResource CardBrush}" CornerRadius="12" IsHitTestVisible="False"><Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.5"/></Border.Effect></Border>
+    <Border Margin="12" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Width="300" Height="200" Background="{StaticResource CardBrush}" CornerRadius="12"
+            BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="42"/></Grid.RowDefinitions>
+        <Grid Margin="14,12,14,0">
+          <TextBlock x:Name="Hint" Text="Start typing your note..." Foreground="{StaticResource Muted2Brush}" FontSize="13" IsHitTestVisible="False"/>
+          <TextBox x:Name="Editor" AutomationProperties.AutomationId="PadEditor" Background="Transparent" BorderThickness="0" AcceptsReturn="True" TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Hidden" Foreground="{StaticResource TextBrush}"
+                   CaretBrush="{StaticResource AccentBrush}" FontFamily="Roboto, Segoe UI" FontSize="13"
+                   TextChanged="Editor_TextChanged" Padding="0"/>
+        </Grid>
+        <TextBlock Grid.Row="1" x:Name="Status" Text="Auto-saves to Notes after 5 mins of inactivity" FontSize="10"
+                   Foreground="{StaticResource Muted2Brush}" Margin="14,4,14,2"/>
+        <Grid Grid.Row="2" Margin="8,0,10,4" MouseLeftButtonDown="Bar_MouseDown" Background="Transparent">
+          <StackPanel Orientation="Horizontal">
+            <ToggleButton x:Name="PinToggle" Width="28" Height="28" IsChecked="True" Focusable="False" Cursor="Hand" Click="Pin_Click" ToolTip="Pin on top (Ctrl + P)">
+              <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                  <Border x:Name="bd" Background="Transparent" CornerRadius="6">
+                    <TextBlock Text="&#xE718;" Style="{StaticResource IconText}" x:Name="g"/>
+                  </Border>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsChecked" Value="True"><Setter TargetName="g" Property="Foreground" Value="{StaticResource AccentBrush}"/></Trigger>
+                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#1C2533"/></Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </ToggleButton.Template>
+            </ToggleButton>
+            <Button Style="{StaticResource IconButton}" Content="&#xE70B;" Click="OpenNotes_Click" ToolTip="Open notes (Ctrl + O)"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="SaveButton" AutomationProperties.AutomationId="PadSave" Style="{StaticResource PrimaryButton}" Content="Save" Height="26" Width="52" FontSize="12" Click="Save_Click" ToolTip="Ctrl + S" Margin="0,0,6,0" Visibility="Collapsed"/>
+            <Button x:Name="MoreButton" Style="{StaticResource IconButton}" Content="&#xE712;" Click="More_Click" ToolTip="More"/>
+          </StackPanel>
+          <Popup x:Name="MorePopup" PlacementTarget="{Binding ElementName=MoreButton}" Placement="Top" StaysOpen="False" AllowsTransparency="True" HorizontalOffset="-110">
+            <Border Margin="8" Width="170" Background="{StaticResource CardBrush}" CornerRadius="8" Padding="4" BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
+              <Border.Effect><DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.5"/></Border.Effect>
+              <StackPanel>
+                <Button Style="{StaticResource MenuRow}" Click="Discard_Click"><Grid><TextBlock Text="Discard" HorizontalAlignment="Left"/><TextBlock Text="Ctrl + D" Foreground="{StaticResource Muted2Brush}" FontSize="10.5" HorizontalAlignment="Right"/></Grid></Button>
+                <Button Style="{StaticResource MenuRow}" Click="Hide_Click"><Grid><TextBlock Text="Hide" HorizontalAlignment="Left"/><TextBlock Text="Esc" Foreground="{StaticResource Muted2Brush}" FontSize="10.5" HorizontalAlignment="Right"/></Grid></Button>
+              </StackPanel>
+            </Border>
+          </Popup>
+        </Grid>
       </Grid>
-      <TextBlock Grid.Row="1" x:Name="Status" Text="Prototype: notes are not persisted yet" FontSize="10"
-                 Foreground="{StaticResource Muted2Brush}" Margin="14,4,14,2"/>
-      <Grid Grid.Row="2" Margin="8,0,10,4" MouseLeftButtonDown="Bar_MouseDown" Background="Transparent">
-        <StackPanel Orientation="Horizontal">
-          <ToggleButton x:Name="PinToggle" Width="28" Height="28" IsChecked="True" Focusable="False" Cursor="Hand" Click="Pin_Click" ToolTip="Pin on top">
-            <ToggleButton.Template>
-              <ControlTemplate TargetType="ToggleButton">
-                <Border x:Name="bd" Background="Transparent" CornerRadius="6">
-                  <TextBlock Text="&#xE718;" Style="{StaticResource IconText}" x:Name="g"/>
-                </Border>
-                <ControlTemplate.Triggers>
-                  <Trigger Property="IsChecked" Value="True"><Setter TargetName="g" Property="Foreground" Value="{StaticResource AccentBrush}"/></Trigger>
-                  <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#1C2533"/></Trigger>
-                </ControlTemplate.Triggers>
-              </ControlTemplate>
-            </ToggleButton.Template>
-          </ToggleButton>
-          <Button Style="{StaticResource IconButton}" Content="&#xE70B;" Click="OpenNotes_Click" ToolTip="Open notes"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-          <Button Style="{StaticResource PrimaryButton}" Content="Save" Height="26" Width="52" FontSize="12" Click="Save_Click" ToolTip="Ctrl + S" Margin="0,0,6,0"/>
-          <Button Style="{StaticResource IconButton}" Content="&#xE712;" Click="Hide_Click" ToolTip="Hide (Esc)"/>
-        </StackPanel>
-      </Grid>
-    </Grid>
-  </Border>
-</Grid>
+    </Border>
+  </Grid>
 </Window>
-

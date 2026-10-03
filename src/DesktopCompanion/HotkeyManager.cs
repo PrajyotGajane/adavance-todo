@@ -45,10 +45,17 @@ public sealed class HotkeyManager : IDisposable
         return IntPtr.Zero;
     }
 
-    public void Dispose()
+    public void Clear()
     {
         foreach (var id in _actions.Keys) UnregisterHotKey(_source.Handle, id);
         _actions.Clear();
+        _nextId = 1;
+    }
+
+    public void Dispose()
+    {
+        Clear();
         _source.RemoveHook(WndProc);
     }
 }
+

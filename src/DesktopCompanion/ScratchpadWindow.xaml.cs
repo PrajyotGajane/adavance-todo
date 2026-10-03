@@ -1,13 +1,13 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DesktopCompanion;
 
 public partial class ScratchpadWindow : Window
 {
-    static readonly Brush Purple = (Brush)new BrushConverter().ConvertFromString("#A032FF")!;
+    readonly DispatcherTimer _idle;
 
     public ScratchpadWindow()
     {
@@ -17,6 +17,14 @@ public partial class ScratchpadWindow : Window
         var area = SystemParameters.WorkArea;
         Left = area.Left + (area.Width - 324) / 2;
         Top = area.Top + area.Height * 0.25;
+
+        var secs = int.TryParse(Environment.GetEnvironmentVariable("DC_AUTOSAVE_SECONDS"), out var s) && s > 0 ? s : 300;
+        _idle = new DispatcherTimer { Interval = TimeSpan.FromSeconds(secs) };
+        _idle.Tick += (_, _) =>
+        {
+            _idle.Stop();
+            if (Commit()) { Hide(); ToastWindow.Popup("Note saved", "Saved to Notes - 5 mins of inactivity"); }
+        };
     }
 
     public void ShowPad()
@@ -27,33 +35,56 @@ public partial class ScratchpadWindow : Window
         Editor.CaretIndex = Editor.Text.Length;
     }
 
-    void Editor_TextChanged(object s, TextChangedEventArgs e) =>
+    void Editor_TextChanged(object s, TextChangedEventArgs e)
+    {
+        bool has = Editor.Text.Trim().Length > 0;
         Hint.Visibility = Editor.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        SaveButton.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        _idle.Stop();
+        if (has) _idle.Start();
+    }
 
     void Bar_MouseDown(object s, MouseButtonEventArgs e) { if (e.OriginalSource is not Button) DragMove(); }
     void Pin_Click(object s, RoutedEventArgs e) => Topmost = PinToggle.IsChecked == true;
-    void Hide_Click(object s, RoutedEventArgs e) => Hide();
+    void Hide_Click(object s, RoutedEventArgs e) { MorePopup.IsOpen = false; Hide(); }
+    void More_Click(object s, RoutedEventArgs e) => MorePopup.IsOpen = !MorePopup.IsOpen;
+    void Discard_Click(object s, RoutedEventArgs e) => Discard();
     void Save_Click(object s, RoutedEventArgs e) => Save();
-    void OpenNotes_Click(object s, RoutedEventArgs e) { App.Notes.Show(); App.Notes.Activate(); }
+    void OpenNotes_Click(object s, RoutedEventArgs e) => App.ShowNotes();
 
-    // Phase 1: a "saved" note only lives in memory; the next note starts empty.
-    void Save()
+    // Writes the draft to the notes table and clears the editor.
+    bool Commit()
     {
         var text = Editor.Text.Trim();
-        if (text.Length == 0) return;
-        var lines = text.Split('\n', 2);
-        var title = lines[0].Trim();
-        var preview = lines.Length > 1 ? lines[1].Trim().Replace("\r", "").Replace("\n", " ") : title;
-        SampleData.Notes.Insert(0, new NoteItem(title, preview, "Today", Purple));
+        if (text.Length == 0) return false;
+        Store.AddNote(text);
         Editor.Clear();
-        Status.Text = "Saved to Notes (in memory only)";
+        return true;
+    }
+
+    public void SaveDraft() => Commit();
+
+    void Save()
+    {
+        if (!Commit()) return;
+        Hide();
+        ToastWindow.Popup("Note saved", "Saved to Notes");
+    }
+
+    void Discard()
+    {
+        MorePopup.IsOpen = false;
+        Editor.Clear();
+        Hide();
     }
 
     void Window_PreviewKeyDown(object s, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape) { Hide(); e.Handled = true; }
-        else if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control) { Save(); e.Handled = true; }
+        var ctrl = Keyboard.Modifiers == ModifierKeys.Control;
+        if (e.Key == Key.Escape) { if (MorePopup.IsOpen) MorePopup.IsOpen = false; else Hide(); e.Handled = true; }
+        else if (ctrl && (e.Key == Key.S || e.Key == Key.Enter)) { Save(); e.Handled = true; }
+        else if (ctrl && e.Key == Key.D) { Discard(); e.Handled = true; }
+        else if (ctrl && e.Key == Key.P) { PinToggle.IsChecked = PinToggle.IsChecked != true; Topmost = PinToggle.IsChecked == true; e.Handled = true; }
+        else if (ctrl && e.Key == Key.O) { App.ShowNotes(); e.Handled = true; }
     }
 }
-
-
