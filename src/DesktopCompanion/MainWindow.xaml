@@ -11,91 +11,9 @@
     <Border x:Name="Card" Width="380" HorizontalAlignment="Left" VerticalAlignment="Top" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" Background="{StaticResource CardBrush}" CornerRadius="12"
             BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
       <Grid>
-       <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-        <Grid x:Name="Header" Height="44" Background="Transparent" Margin="8,0,8,0"
-              MouseLeftButtonDown="Header_MouseDown">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          <Button x:Name="MenuButton" Style="{StaticResource IconButton}" Content="&#xE700;" Click="Menu_Click" AutomationProperties.AutomationId="MenuButton"/>
-          <TextBlock x:Name="NotesTitle" Grid.Column="1" Text="Notes" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0" Visibility="Collapsed"/>
-          <StackPanel x:Name="TabsPanel" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-            <RadioButton x:Name="TabToday" Style="{StaticResource TabButton}" Tag="Today" IsChecked="True" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabToday">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="11.5" Text="Today" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
-                <Border Background="{StaticResource SelectedBadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountToday" FontSize="10"/></Border>
-              </StackPanel>
-            </RadioButton>
-            <RadioButton x:Name="TabUpcoming" Style="{StaticResource TabButton}" Tag="Upcoming" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabUpcoming">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="11.5" Text="Upcoming" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
-                <Border Background="{StaticResource BadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountUpcoming" FontSize="10"/></Border>
-              </StackPanel>
-            </RadioButton>
-            <RadioButton x:Name="TabBacklog" Style="{StaticResource TabButton}" Tag="Backlog" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabBacklog">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="11.5" Text="Backlog" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
-                <Border Background="{StaticResource BadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountBacklog" FontSize="10"/></Border>
-              </StackPanel>
-            </RadioButton>
-            <RadioButton x:Name="TabLater" Style="{StaticResource TabButton}" Tag="Later" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabLater">
-              <TextBlock FontSize="11.5" Text="Later" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
-            </RadioButton>
-          </StackPanel>
-          <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE710;" AutomationProperties.AutomationId="AddButton" Click="Add_Click"/>
-        </Grid>
-
-        <Grid x:Name="TasksBody" Grid.Row="1">
-          <ScrollViewer x:Name="ListScroll" VerticalScrollBarVisibility="Hidden" MaxHeight="124" Margin="0,0,0,8" Focusable="False">
-            <ListBox x:Name="TaskList" Style="{StaticResource PlainList}" AutomationProperties.AutomationId="TaskList"
-                     ScrollViewer.CanContentScroll="False"
-                     PreviewMouseLeftButtonDown="List_MouseDown" PreviewMouseMove="List_MouseMove">
-              <ListBox.ItemTemplate>
-                <DataTemplate>
-                  <Border x:Name="row" Height="31" Background="Transparent" BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,0,0,1">
-                    <Grid>
-                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="32"/>
-                      </Grid.ColumnDefinitions>
-                      <Border Background="{Binding Accent}" CornerRadius="0,2,2,0" Margin="0,3"/>
-                      <CheckBox Grid.Column="1" Style="{StaticResource TaskCheck}" IsChecked="{Binding IsDone, Mode=TwoWay}" Margin="13,0,12,0" VerticalAlignment="Center"/>
-                      <TextBlock x:Name="title" Grid.Column="2" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
-                      <TextBlock x:Name="when" Grid.Column="3" Text="{Binding When}" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                      <TextBlock x:Name="icon" Grid.Column="4" Text="{Binding Icon}" Style="{StaticResource IconText}" Foreground="{StaticResource Muted2Brush}"/>
-                      <Button x:Name="del" Grid.Column="4" Style="{StaticResource IconButton}" Content="&#xE74D;" Width="26" Height="24" Visibility="Collapsed" Click="Delete_Click" ToolTip="Delete (Del)"/>
-                    </Grid>
-                  </Border>
-                  <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                      <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
-                      <Setter TargetName="del" Property="Visibility" Value="Visible"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsDone}" Value="True">
-                      <Setter TargetName="title" Property="TextDecorations" Value="Strikethrough"/>
-                      <Setter TargetName="title" Property="Foreground" Value="{StaticResource Muted2Brush}"/>
-                      <Setter TargetName="title" Property="Opacity" Value="0.6"/>
-                      <Setter TargetName="row" Property="Opacity" Value="0.7"/>
-                    </DataTrigger>
-                  </DataTemplate.Triggers>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-          </ScrollViewer>
-          <TextBlock x:Name="EmptyText" Text="Nothing here. Press N to add a task." Foreground="{StaticResource Muted2Brush}" FontSize="11.5"
-                     HorizontalAlignment="Center" Margin="0,18,0,26" Visibility="Collapsed"/>
-        </Grid>
-        <local:NotesView x:Name="NotesPane" Grid.Row="1" Visibility="Collapsed"/>
-
-        <Border x:Name="Scrim" Grid.RowSpan="2" Background="#99000000" CornerRadius="12" Visibility="Collapsed" MouseLeftButtonDown="Scrim_Down"/>
-        <Border x:Name="Drawer" Grid.RowSpan="2" Width="224" HorizontalAlignment="Left" Visibility="Collapsed" Background="#0E141D" CornerRadius="12,0,0,12"
+<Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Border x:Name="Drawer" Grid.Column="0" Width="224" HorizontalAlignment="Left" Visibility="Collapsed" Background="#0E141D" CornerRadius="12,0,0,12"
                 BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="0,0,1,0" Padding="8,6">
-          <Border.RenderTransform><TranslateTransform x:Name="DrawerShift" X="-224"/></Border.RenderTransform>
           <ScrollViewer VerticalScrollBarVisibility="Hidden" Focusable="False">
         <StackPanel x:Name="MenuStack">
           <TextBlock Text="MENU" FontSize="10" Foreground="{StaticResource Muted2Brush}" Margin="10,4,0,6"/>
@@ -137,7 +55,91 @@
         </StackPanel>
           </ScrollViewer>
         </Border>
-      </Grid>
+<Grid Grid.Column="1">
+       <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <Grid x:Name="Header" Height="44" Background="Transparent" Margin="8,0,8,0"
+              MouseLeftButtonDown="Header_MouseDown">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Button x:Name="MenuButton" Style="{StaticResource IconButton}" Content="&#xE700;" Click="Menu_Click" AutomationProperties.AutomationId="MenuButton"/>
+          <TextBlock x:Name="NotesTitle" Grid.Column="1" Text="Notes" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0" Visibility="Collapsed"/>
+          <StackPanel x:Name="TabsPanel" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+            <RadioButton x:Name="TabToday" Style="{StaticResource TabButton}" Tag="Today" IsChecked="True" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabToday">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="11.5" Text="Today" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
+                <Border Background="{StaticResource SelectedBadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountToday" FontSize="10"/></Border>
+              </StackPanel>
+            </RadioButton>
+            <RadioButton x:Name="TabUpcoming" Style="{StaticResource TabButton}" Tag="Upcoming" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabUpcoming">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="11.5" Text="Upcoming" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
+                <Border Background="{StaticResource BadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountUpcoming" FontSize="10"/></Border>
+              </StackPanel>
+            </RadioButton>
+            <RadioButton x:Name="TabBacklog" Style="{StaticResource TabButton}" Tag="Backlog" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabBacklog">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="11.5" Text="Backlog" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
+                <Border Background="{StaticResource BadgeBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"><TextBlock x:Name="CountBacklog" FontSize="10"/></Border>
+              </StackPanel>
+            </RadioButton>
+            <RadioButton x:Name="TabLater" Style="{StaticResource TabButton}" Tag="Later" Checked="Tab_Checked" AllowDrop="True" DragEnter="Tab_DragOver" DragOver="Tab_DragOver" DragLeave="Tab_DragLeave" Drop="Tab_Drop" AutomationProperties.AutomationId="TabLater">
+              <TextBlock FontSize="11.5" Text="Later" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" VerticalAlignment="Center"/>
+            </RadioButton>
+          </StackPanel>
+          <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE710;" AutomationProperties.AutomationId="AddButton" Click="Add_Click"/>
+        </Grid>
+
+        <Grid x:Name="TasksBody" Grid.Row="1">
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+          <Border x:Name="InlineBox" Visibility="Collapsed" BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,1,0,1" Margin="0,0,0,4"><local:QuickAddView x:Name="InlineAdd"/></Border>
+          <ScrollViewer x:Name="ListScroll" Grid.Row="1" VerticalScrollBarVisibility="Hidden" MaxHeight="124" Margin="0,0,0,8" Focusable="False">
+            <ListBox x:Name="TaskList" Style="{StaticResource PlainList}" AutomationProperties.AutomationId="TaskList"
+                     ScrollViewer.CanContentScroll="False"
+                     PreviewMouseLeftButtonDown="List_MouseDown" PreviewMouseMove="List_MouseMove">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Border x:Name="row" Height="31" Background="Transparent" BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,0,0,1">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="32"/>
+                      </Grid.ColumnDefinitions>
+                      <Border Background="{Binding Accent}" CornerRadius="0,2,2,0" Margin="0,3"/>
+                      <CheckBox Grid.Column="1" Style="{StaticResource TaskCheck}" IsChecked="{Binding IsDone, Mode=TwoWay}" Margin="13,0,12,0" VerticalAlignment="Center"/>
+                      <TextBlock x:Name="title" Grid.Column="2" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
+                      <TextBlock x:Name="when" Grid.Column="3" Text="{Binding When}" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                      <TextBlock x:Name="icon" Grid.Column="4" Text="{Binding Icon}" Style="{StaticResource IconText}" Foreground="{StaticResource Muted2Brush}"/>
+                      <Button x:Name="del" Grid.Column="4" Style="{StaticResource IconButton}" Content="&#xE74D;" Width="26" Height="24" Visibility="Collapsed" Click="Delete_Click" ToolTip="Delete (Del)"/>
+                    </Grid>
+                  </Border>
+                  <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                      <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                      <Setter TargetName="del" Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDone}" Value="True">
+                      <Setter TargetName="title" Property="TextDecorations" Value="Strikethrough"/>
+                      <Setter TargetName="title" Property="Foreground" Value="{StaticResource Muted2Brush}"/>
+                      <Setter TargetName="title" Property="Opacity" Value="0.6"/>
+                      <Setter TargetName="row" Property="Opacity" Value="0.7"/>
+                    </DataTrigger>
+                  </DataTemplate.Triggers>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </ScrollViewer>
+          <TextBlock x:Name="EmptyText" Grid.Row="1" Text="Nothing here. Press N to add a task." Foreground="{StaticResource Muted2Brush}" FontSize="11.5"
+                     HorizontalAlignment="Center" Margin="0,18,0,26" Visibility="Collapsed"/>
+        </Grid>
+        <local:NotesView x:Name="NotesPane" Grid.Row="1" Visibility="Collapsed"/>
+</Grid>
+    </Grid>
     </Border>
   </Grid>
 </Window>
