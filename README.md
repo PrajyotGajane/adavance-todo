@@ -43,3 +43,5 @@ Up/Down/Home/End/PgUp/PgDn select - Left/Right or 1-4 switch tab - Space done - 
 Shift+Left/Right move task between tabs - N new task - Shift+N scratchpad - O notes - E expand - T always on top -
 M/F10 menu - Ctrl+, settings - F1 shortcuts - Esc hide - Ctrl+Q quit.
 Global: Ctrl+Alt+T quick add, Ctrl+Alt+J scratchpad, Ctrl+Alt+H show/hide.
+
+- Hamburger (or M / F10) opens a left drawer (Tasks, Notes, settings, ...). Notes open inside the main window (O), no separate window.

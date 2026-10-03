@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     readonly RadioButton[] _tabs;
     List<Button> _menuRows = new();
     int _menuIdx = -1;
+    bool _drawerOpen, _notesMode;
     Point _dragStart;
     TaskItem? _dragItem;
     DateTime _day = DateTime.Today;
@@ -30,6 +31,7 @@ public partial class MainWindow : Window
         Topmost = Prefs.OnTop;
         Opacity = Prefs.Opacity;
         RestorePosition();
+        NotesPane.CloseRequested += ShowTasksView;
         SetExpanded(Prefs.Expanded);
         RefreshHints();
         TopCheck.Visibility = Topmost ? Visibility.Visible : Visibility.Hidden;
@@ -93,7 +95,8 @@ public partial class MainWindow : Window
 
     public void HideToTray()
     {
-        MenuPopup.IsOpen = false;
+        CloseDrawer();
+        CommitNotes();
         SavePosition();
         Hide();
         App.TrimMemory();
@@ -266,9 +269,16 @@ public partial class MainWindow : Window
     {
         _expanded = on;
         Card.Width = on ? 500 : 380;
-        ListScroll.MinHeight = on ? 446 : 0;
-        ListScroll.MaxHeight = on ? 446 : 124;
+        ListScroll.MaxHeight = on ? double.PositiveInfinity : 124;
         ToggleViewText.Text = on ? "Compact view" : "Expanded view";
+        UpdateCardHeight();
+    }
+
+    // Compact cards grow while the drawer or notes are showing so they have room.
+    void UpdateCardHeight()
+    {
+        Card.Height = _expanded ? 500 : double.NaN;
+        Card.MinHeight = !_expanded && (_drawerOpen || _notesMode) ? 400 : 0;
     }
 
     void ToggleExpanded() { SetExpanded(!_expanded); Prefs.Expanded = _expanded; }
@@ -280,7 +290,7 @@ public partial class MainWindow : Window
         TopCheck.Visibility = Topmost ? Visibility.Visible : Visibility.Hidden;
     }
 
-    // ---- menu ----
+    // ---- drawer ----
 
     void SetMenuIndex(int i)
     {
@@ -290,25 +300,74 @@ public partial class MainWindow : Window
 
     void OpenMenu()
     {
+        if (_drawerOpen) return;
+        _drawerOpen = true;
         TopCheck.Visibility = Topmost ? Visibility.Visible : Visibility.Hidden;
-        MenuPopup.IsOpen = true;
+        UpdateCardHeight();
+        Scrim.Visibility = Visibility.Visible;
+        Drawer.Visibility = Visibility.Visible;
+        DrawerShift.BeginAnimation(TranslateTransform.XProperty, new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(140))
+            { EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut } });
         SetMenuIndex(0);
     }
 
-    void Menu_Closed(object? s, EventArgs e) => SetMenuIndex(-1);
+    void CloseDrawer()
+    {
+        if (!_drawerOpen) return;
+        _drawerOpen = false;
+        SetMenuIndex(-1);
+        Scrim.Visibility = Visibility.Collapsed;
+        DrawerShift.BeginAnimation(TranslateTransform.XProperty, null);
+        DrawerShift.X = -224;
+        Drawer.Visibility = Visibility.Collapsed;
+        UpdateCardHeight();
+        Focus();
+    }
 
-    void Menu_Click(object s, RoutedEventArgs e) { if (MenuPopup.IsOpen) MenuPopup.IsOpen = false; else OpenMenu(); }
-    void ToggleView_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; ToggleExpanded(); }
-    void Top_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; ToggleTop(); }
-    void Add_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.QuickAdd.ShowOverlay(); }
-    void AddNote_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.Scratchpad.ShowPad(); }
-    void Notes_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.ShowNotes(); }
-    void Settings_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.ShowSettings(0); }
-    void Appearance_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.ShowSettings(1); }
-    void Shortcuts_Click(object s, RoutedEventArgs e) { MenuPopup.IsOpen = false; App.ShowSettings(2); }
+    void Menu_Click(object s, RoutedEventArgs e) { if (_drawerOpen) CloseDrawer(); else OpenMenu(); }
+    void Scrim_Down(object s, MouseButtonEventArgs e) { CloseDrawer(); e.Handled = true; }
+
+    // ---- notes pane ----
+
+    public void ShowNotesView()
+    {
+        CloseDrawer();
+        _notesMode = true;
+        TasksBody.Visibility = Visibility.Collapsed;
+        TabsPanel.Visibility = Visibility.Collapsed;
+        NotesTitle.Visibility = Visibility.Visible;
+        NotesPane.Visibility = Visibility.Visible;
+        UpdateCardHeight();
+        NotesPane.Open();
+    }
+
+    public void ShowTasksView()
+    {
+        CloseDrawer();
+        if (_notesMode) NotesPane.Commit();
+        _notesMode = false;
+        NotesPane.Visibility = Visibility.Collapsed;
+        NotesTitle.Visibility = Visibility.Collapsed;
+        TabsPanel.Visibility = Visibility.Visible;
+        TasksBody.Visibility = Visibility.Visible;
+        UpdateCardHeight();
+        TaskList.Focus();
+        Focus();
+    }
+
+    public void CommitNotes() { if (_notesMode) NotesPane.Commit(); }
+
+    void Tasks_Click(object s, RoutedEventArgs e) => ShowTasksView();
+    void ToggleView_Click(object s, RoutedEventArgs e) { CloseDrawer(); ToggleExpanded(); }
+    void Top_Click(object s, RoutedEventArgs e) { CloseDrawer(); ToggleTop(); }
+    void Add_Click(object s, RoutedEventArgs e) { CloseDrawer(); if (_notesMode) App.Scratchpad.ShowPad(); else App.QuickAdd.ShowOverlay(); }
+    void AddNote_Click(object s, RoutedEventArgs e) { CloseDrawer(); App.Scratchpad.ShowPad(); }
+    void Notes_Click(object s, RoutedEventArgs e) => ShowNotesView();
+    void Settings_Click(object s, RoutedEventArgs e) { CloseDrawer(); App.ShowSettings(0); }
+    void Appearance_Click(object s, RoutedEventArgs e) { CloseDrawer(); App.ShowSettings(1); }
+    void Shortcuts_Click(object s, RoutedEventArgs e) { CloseDrawer(); App.ShowSettings(2); }
     void Hide_Click(object s, RoutedEventArgs e) => HideToTray();
     void Quit_Click(object s, RoutedEventArgs e) => App.Quit();
-
     // ---- keyboard ----
 
     void Window_PreviewKeyDown(object s, KeyEventArgs e)
@@ -317,7 +376,7 @@ public partial class MainWindow : Window
         var mods = Keyboard.Modifiers;
         bool ctrl = mods == ModifierKeys.Control, shift = mods == ModifierKeys.Shift, none = mods == ModifierKeys.None;
 
-        if (MenuPopup.IsOpen && (none || shift))
+        if (_drawerOpen && (none || shift))
         {
             switch (key)
             {
@@ -329,8 +388,18 @@ public partial class MainWindow : Window
                 case Key.Space:
                     if (_menuIdx >= 0) _menuRows[_menuIdx].RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
                     e.Handled = true; return;
-                case Key.Escape: MenuPopup.IsOpen = false; e.Handled = true; return;
+                case Key.Escape:
+                case Key.M:
+                case Key.F10: CloseDrawer(); e.Handled = true; return;
             }
+        }
+
+        if (_notesMode)
+        {
+            if (none && key == Key.F10) { OpenMenu(); e.Handled = true; return; }
+            if (none && key == Key.F1) { App.ShowSettings(2); e.Handled = true; return; }
+            if (NotesPane.HandleKey(key, mods)) { e.Handled = true; return; }
+            if (!ctrl) return;
         }
 
         bool handled = true;
@@ -359,7 +428,7 @@ public partial class MainWindow : Window
         else if (none && key == Key.Delete) { if (Selected is { } t) Store.DeleteTask(t); }
         else if (none && key == Key.N) App.QuickAdd.ShowOverlay();
         else if (shift && key == Key.N) App.Scratchpad.ShowPad();
-        else if (none && key == Key.O) App.ShowNotes();
+        else if (none && key == Key.O) ShowNotesView();
         else if (none && key == Key.E) ToggleExpanded();
         else if (none && key == Key.T) ToggleTop();
         else handled = false;

@@ -9,7 +9,6 @@ public partial class App : Application
 {
     static QuickAddWindow? _quick;
     static ScratchpadWindow? _pad;
-    static NotesWindow? _notes;
     static SettingsWindow? _settings;
     Mutex? _single;
     Tray? _tray;
@@ -20,9 +19,8 @@ public partial class App : Application
     // Created on first use to keep idle memory low.
     public static QuickAddWindow QuickAdd => _quick ??= new QuickAddWindow();
     public static ScratchpadWindow Scratchpad => _pad ??= new ScratchpadWindow();
-    public static NotesWindow Notes => _notes ??= new NotesWindow();
 
-    public static void ShowNotes() { Notes.ShowList(); }
+    public static void ShowNotes() { Widget.ShowWidget(); Widget.ShowNotesView(); }
     public static void ShowSettings(int row) { (_settings ??= new SettingsWindow()).ShowAt(row); }
 
     [DllImport("psapi.dll")]
@@ -57,6 +55,7 @@ public partial class App : Application
         Quitting = true;
         Widget.SavePosition();
         _pad?.SaveDraft();
+        Widget?.CommitNotes();
         Current.Shutdown();
     }
 

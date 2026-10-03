@@ -4,30 +4,27 @@ using System.Windows.Input;
 
 namespace DesktopCompanion;
 
-public partial class NotesWindow : Window
+public partial class NotesView : UserControl
 {
     NoteItem? _editing;
 
-    public NotesWindow()
+    public event Action? CloseRequested;
+
+    public NotesView()
     {
         InitializeComponent();
-        WindowStartupLocation = WindowStartupLocation.Manual;
-        var area = SystemParameters.WorkArea;
-        Left = area.Left + 400;
-        Top = area.Top + 80;
         Store.NotesChanged += Rebuild;
-        IsVisibleChanged += (_, _) => { if (!IsVisible) App.TrimMemory(); };
         Rebuild();
     }
 
-    public void ShowList()
+    public void Open()
     {
         CommitEdit();
         ShowListView();
-        Show();
-        Activate();
         Search.Focus();
     }
+
+    public void Commit() => CommitEdit();
 
     void ShowListView()
     {
@@ -56,8 +53,6 @@ public partial class NotesWindow : Window
         else Store.UpdateNote(n, text);
     }
 
-    void CloseWindow() { CommitEdit(); _editing = null; Hide(); }
-
     void Rebuild()
     {
         if (NoteList == null) return;
@@ -70,11 +65,6 @@ public partial class NotesWindow : Window
         if (items.Count > 0) NoteList.SelectedIndex = Math.Min(idx, items.Count - 1);
     }
 
-    void Drag(object s, MouseButtonEventArgs e) { if (e.OriginalSource is not TextBox && e.ButtonState == MouseButtonState.Pressed) DragMove(); }
-    void Close_Click(object s, RoutedEventArgs e) => CloseWindow();
-    void Tasks_Click(object s, RoutedEventArgs e) { CloseWindow(); App.Widget.ShowWidget(); }
-    void Settings_Click(object s, RoutedEventArgs e) => App.ShowSettings(0);
-    void New_Click(object s, RoutedEventArgs e) => App.Scratchpad.ShowPad();
     void Back_Click(object s, RoutedEventArgs e) { CommitEdit(); ShowListView(); Search.Focus(); }
     void Delete_Click(object s, RoutedEventArgs e) { if (_editing is { } n) { _editing = null; Store.DeleteNote(n); ShowListView(); Search.Focus(); } }
 
@@ -98,33 +88,37 @@ public partial class NotesWindow : Window
         NoteList.ScrollIntoView(NoteList.SelectedItem);
     }
 
-    void Window_PreviewKeyDown(object s, KeyEventArgs e)
+    // Returns true when the key was consumed by the notes pane.
+    public bool HandleKey(Key key, ModifierKeys mods)
     {
-        var mods = Keyboard.Modifiers;
         bool ctrl = mods == ModifierKeys.Control;
         if (_editing != null)
         {
-            if (e.Key == Key.Escape) { Back_Click(s, e); e.Handled = true; }
-            else if (ctrl && e.Key == Key.S) { CommitEdit(); e.Handled = true; }
-            else if (ctrl && e.Key == Key.D) { Delete_Click(s, e); e.Handled = true; }
-            return;
+            if (key == Key.Escape) { Back_Click(this, new RoutedEventArgs()); return true; }
+            if (ctrl && key == Key.S) { CommitEdit(); return true; }
+            if (ctrl && key == Key.D) { Delete_Click(this, new RoutedEventArgs()); return true; }
+            return false;
         }
-        if (e.Key == Key.Escape)
+        if (key == Key.Escape)
         {
-            if (Search.Text.Length > 0) Search.Clear(); else CloseWindow();
-            e.Handled = true;
+            if (Search.Text.Length > 0) Search.Clear(); else CloseRequested?.Invoke();
+            return true;
         }
-        else if (e.Key == Key.Down) { Move(1); e.Handled = true; }
-        else if (e.Key == Key.Up) { Move(-1); e.Handled = true; }
-        else if (e.Key == Key.PageDown) { Move(4); e.Handled = true; }
-        else if (e.Key == Key.PageUp) { Move(-4); e.Handled = true; }
-        else if (e.Key == Key.Enter) { if (NoteList.SelectedItem is NoteItem n) OpenNote(n); e.Handled = true; }
-        else if (ctrl && e.Key == Key.N) { App.Scratchpad.ShowPad(); e.Handled = true; }
-        else if ((ctrl && e.Key == Key.D) || (e.Key == Key.Delete && Search.Text.Length == 0))
+        if (mods != ModifierKeys.None && !ctrl) return false;
+        switch (key)
+        {
+            case Key.Down when !ctrl: Move(1); return true;
+            case Key.Up when !ctrl: Move(-1); return true;
+            case Key.PageDown when !ctrl: Move(4); return true;
+            case Key.PageUp when !ctrl: Move(-4); return true;
+            case Key.Enter when !ctrl: if (NoteList.SelectedItem is NoteItem n) OpenNote(n); return true;
+            case Key.N when ctrl: App.Scratchpad.ShowPad(); return true;
+        }
+        if ((ctrl && key == Key.D) || (key == Key.Delete && Search.Text.Length == 0))
         {
             if (NoteList.SelectedItem is NoteItem n) Store.DeleteNote(n);
-            e.Handled = true;
+            return true;
         }
+        return false;
     }
 }
-
