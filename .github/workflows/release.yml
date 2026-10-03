@@ -43,6 +43,14 @@ jobs:
           Compress-Archive publish/DesktopCompanion.exe "$name.zip"
           (Get-FileHash "$name.zip" -Algorithm SHA256).Hash.ToLower() + "  $name.zip" | Out-File "$name.zip.sha256" -Encoding ascii
 
+      - name: Build MSIX (Microsoft Store package)
+        shell: pwsh
+        env:
+          MSIX_IDENTITY_NAME: ${{ vars.MSIX_IDENTITY_NAME }}
+          MSIX_PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+          MSIX_PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+        run: ./packaging/build-msix.ps1 -PublishDir publish -Version ${{ steps.v.outputs.ver }} -Out "DesktopCompanion-${{ steps.v.outputs.tag }}-x64.msix"
+
       - uses: actions/upload-artifact@v4
         with:
           name: DesktopCompanion-win-x64
