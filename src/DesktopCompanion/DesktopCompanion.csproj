@@ -3,10 +3,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Version>0.0.1</Version>
     <AssemblyName>DesktopCompanion</AssemblyName>
     <RootNamespace>DesktopCompanion</RootNamespace>
     <TieredPGO>false</TieredPGO>
@@ -14,10 +13,4 @@
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
-  <ItemGroup>
-    <Resource Include="app.ico" />
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.*" />
-  </ItemGroup>
 </Project>

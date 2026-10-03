@@ -46,3 +46,6 @@ Global: Ctrl+Alt+T quick add, Ctrl+Alt+J scratchpad, Ctrl+Alt+H show/hide.
 
 - Hamburger (or M / F10) opens a left drawer (Tasks, Notes, settings, ...). Notes open inside the main window (O), no separate window.
 - The drawer is docked and stays open (state remembered); M / F10 focuses it, Esc returns to the list. In expanded view, N / Enter / F2 add and edit tasks inline; compact view and the global shortcut use the quick-add overlay.
+
+## Releases
+Pushing a tag like `v0.0.1` runs .github/workflows/release.yml, which builds a self-contained single-file exe (no .NET install, no admin rights) and attaches a zip + SHA256 to a GitHub release.
