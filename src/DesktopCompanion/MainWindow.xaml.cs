@@ -29,10 +29,10 @@ public partial class MainWindow : Window
     {
         _hotkeys = new HotkeyManager(new WindowInteropHelper(this).Handle);
         var failed = new List<string>();
-        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Shift, Key.N, () => App.QuickAdd.ShowOverlay()))
-            failed.Add("Ctrl+Shift+N (quick add)");
-        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Alt, Key.N, ToggleScratchpad))
-            failed.Add("Ctrl+Alt+N (scratchpad)");
+        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Alt, Key.T, () => App.QuickAdd.ShowOverlay()))
+            failed.Add("Ctrl+Alt+T (quick add)");
+        if (!_hotkeys.Register(ModifierKeys.Control | ModifierKeys.Alt, Key.J, ToggleScratchpad))
+            failed.Add("Ctrl+Alt+J (scratchpad)");
         if (failed.Count > 0)
             MessageBox.Show("These shortcuts are already used by another app:\n" + string.Join("\n", failed), "Desktop Companion");
     }
@@ -93,6 +93,7 @@ public partial class MainWindow : Window
         if (ctrl && e.Key == Key.H) WindowState = WindowState.Minimized;
     }
 }
+
 
 
 
